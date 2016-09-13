@@ -12,7 +12,9 @@ import com.jogamp.opengl.awt.GLCanvas;
 
 
 public class Main extends Frame{
-	
+
+	private static final long serialVersionUID = 1L;
+
 	static Animator anim = null;
 	private void setupJOGL(){
 	    GLCapabilities caps = new GLCapabilities(null);
@@ -22,9 +24,11 @@ public class Main extends Frame{
 	    GLCanvas canvas = new GLCanvas(caps); 
         add(canvas);
 
-        
-        canvas.addGLEventListener(new JoglEventListener());
-        canvas.addKeyListener(new JoglEventListener());
+        //Create object for JogleEventListener
+        JoglEventListener listen = new JoglEventListener();
+        //Sync EventListener and KeyListener with listen object
+        canvas.addGLEventListener(listen);
+        canvas.addKeyListener(listen);
 
         anim = new Animator(canvas);
         anim.start();
@@ -47,7 +51,7 @@ public class Main extends Frame{
             }
         });
         
-        setSize(600, 600);
+        setSize(700, 600);
         setLocation(40, 40);
 
         setVisible(true);

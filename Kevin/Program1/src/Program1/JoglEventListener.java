@@ -10,11 +10,10 @@ import com.jogamp.opengl.glu.GLU;
 
 public class JoglEventListener implements GLEventListener, KeyListener {
 
-//	float backrgb[] = new float[4]; 
-//	float rot; 
-	float radius = 0.5f;
-	float cx = 0.0f;
-    float cy = 0.0f;
+	float radius = 0.5f; //radius
+	float cx = -2.0f; //x coordinate
+    float cy = 0.0f; //y coordinate
+    float rot; 
 
     	private GLU glu = new GLU();
 
@@ -61,13 +60,13 @@ public class JoglEventListener implements GLEventListener, KeyListener {
 			// TODO Auto-generated method stub
 			final GL2 gl = gLDrawable.getGL().getGL2();
 
-//			gl.glClearColor(backrgb[0], 0, 1, 1);
-			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
-	        gl.glTranslatef(0.0f, 0.0f, -6.0f);                        
+			gl.glClearColor(0, 0, 0, 0); //set screen to clear to black
+			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT); //clear the screen
+	        gl.glTranslatef(0.0f, 0.0f, -6.0f);//Set up the grid                        
 	        
 	        //Draw Circle
-	        gl.glBegin(GL.GL_LINE_LOOP);        
-	        gl.glColor3f(1.0f, 0.0f, 0.0f);   
+	        gl.glBegin(GL.GL_LINE_LOOP); //Set drawing method to line loop        
+	        gl.glColor3f(1.0f, 0.0f, 0.0f); //Set color to Red   
 	        float lineSegments = 20f;
 	        for (int i = 0; i < lineSegments; i++) {
 	        	float theta = 2.0f * 3.14f * (float) i / lineSegments;
@@ -77,7 +76,36 @@ public class JoglEventListener implements GLEventListener, KeyListener {
 	        }
 	        gl.glEnd();
 	        
-	        gl.glLoadIdentity();
+	        gl.glRotatef(rot, 0.0f, 1.0f, 0.0f);
+	        gl.glBegin(GL.GL_TRIANGLES);        // Drawing Using Triangles
+	        gl.glColor3f(1.0f, 0.0f, 0.0f);     // Red
+	        gl.glVertex3f(0.0f, 1.0f, 0.0f);    // Top Of Triangle (Front)
+	        gl.glColor3f(0.0f, 1.0f, 0.0f);     // Green
+	        gl.glVertex3f(-1.0f, -1.0f, 1.0f);  // Left Of Triangle (Front)
+	        gl.glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+	        gl.glVertex3f(1.0f, -1.0f, 1.0f);   // Right Of Triangle (Front)
+	        gl.glColor3f(1.0f, 0.0f, 0.0f);     // Red
+	        gl.glVertex3f(0.0f, 1.0f, 0.0f);    // Top Of Triangle (Right)
+	        gl.glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+	        gl.glVertex3f(1.0f, -1.0f, 1.0f);   // Left Of Triangle (Right)
+	        gl.glColor3f(0.0f, 1.0f, 0.0f);     // Green
+	        gl.glVertex3f(1.0f, -1.0f, -1.0f);  // Right Of Triangle (Right)
+	        gl.glColor3f(1.0f, 0.0f, 0.0f);     // Red
+	        gl.glVertex3f(0.0f, 1.0f, 0.0f);    // Top Of Triangle (Back)
+	        gl.glColor3f(0.0f, 1.0f, 0.0f);     // Green
+	        gl.glVertex3f(1.0f, -1.0f, -1.0f);  // Left Of Triangle (Back)
+	        gl.glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+	        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Right Of Triangle (Back)
+	        gl.glColor3f(1.0f, 0.0f, 0.0f);     // Red
+	        gl.glVertex3f(0.0f, 1.0f, 0.0f);    // Top Of Triangle (Left)
+	        gl.glColor3f(0.0f, 0.0f, 1.0f);     // Blue
+	        gl.glVertex3f(-1.0f, -1.0f, -1.0f); // Left Of Triangle (Left)
+	        gl.glColor3f(0.0f, 1.0f, 0.0f);     // Green
+	        gl.glVertex3f(-1.0f, -1.0f, 1.0f);  // Right Of Triangle (Left)
+	        gl.glEnd();                         // Finished Drawing The Triangle
+	        
+	        rot += 0.01;
+	        gl.glLoadIdentity();//Replace matrix with identity matrix. Load the circle.
 
 	        
 		}
@@ -87,32 +115,33 @@ public class JoglEventListener implements GLEventListener, KeyListener {
 			// TODO Auto-generated method stub
 			
 		}
-
-		 public void keyPressed(KeyEvent e) {
+		
+		@Override
+		public void keyPressed(KeyEvent e) {
 		    if (e.getKeyCode() == KeyEvent.VK_A) {
-		      cx -= 1f;
+		      cx -= 0.1f;
 		      System.out.println("Horizontal Coordinate:" + cx);
 		    }
 		    if (e.getKeyCode() == KeyEvent.VK_F) {
-		      cx += 1f;
+		      cx += 0.1f;
 		      System.out.println("Horizontal Coordinate:" + cx);
 		    }
 		    if (e.getKeyCode() == KeyEvent.VK_Z) {
-		      cy -= 1f;
+		      cy -= 0.1f;
 		      System.out.println("Vertical Coordinate:" + cy);
 		      
 		    }
 		    if (e.getKeyCode() == KeyEvent.VK_W) {
-		      cy += 1f;
+		      cy += 0.1f;
 		      System.out.println("Vertical Coordinate:" + cy);
 		    }
 		    if (e.getKeyCode() == KeyEvent.VK_P) {
-		      radius += 1f;
-		      System.out.println("Circe Radius:" + radius);
+		      radius += 0.1f;
+		      System.out.println("Circle Radius:" + radius);
 		    }
 		    if (e.getKeyCode() == KeyEvent.VK_O) {   
-		      if (radius > 1f) {
-		    	  radius -= 1f;
+		      if (radius > 0.2f) {
+		    	  radius -= 0.1f;
 		      }
 		      System.out.println("Circle Radius:" + radius);
 		    }
