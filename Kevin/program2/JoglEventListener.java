@@ -205,7 +205,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    public void transform(){
 	    	// perform your transformation
 	    	if(transCom == 't' && (clickDif[0] != 0 || clickDif[1] != 0)){
-	    		translation(vertices, clickDif);
+	    		translation(clickDif);
 	    	}
 	    	else if (transCom == 'r' && (clickDif[0] != 0 || clickDif[1] != 0)){
 	    		if(mouseButt == 'l'){
@@ -440,7 +440,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			// TODO Auto-generated method stub	
 		}
 
-		public void translation(float[] vertices, float[] trans){
+		public void translation(float[] trans){
 			float[][] matrix = {{1.0f, 0.0f, 0.0f, trans[0]},
 		                       {0.0f, 1.0f, 0.0f, trans[1]},
 		                       {0.0f, 0.0f, 1.0f, trans[2]},
