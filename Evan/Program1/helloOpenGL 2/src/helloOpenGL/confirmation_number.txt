@@ -1,0 +1,4 @@
+Skipping file type check.
+BYPASS: Checking uploaded file for viruses:
+File uploaded successfully.
+This is your confirmation number: ID=87347.

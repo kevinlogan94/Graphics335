@@ -1,0 +1,8 @@
+Evan Heaton
+CS335: Graphics and Multimedia
+Program 1
+
+This program draws a circle, which can be moved around the screen with WASD and scaled with O/P.
+Also a predefined shape (UK logo) is drawn according to the indices and vertices matrices.
+
+The main() function is located in the HelloOpenGL.java file. 
