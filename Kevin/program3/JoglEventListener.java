@@ -12,7 +12,7 @@ import com.jogamp.opengl.GL2;
 import com.jogamp.opengl.GLAutoDrawable;
 import com.jogamp.opengl.GLEventListener;
 import com.jogamp.opengl.glu.GLU;
-import com.jogamp.opengl.util.gl2.GLUT;
+//import com.jogamp.opengl.util.gl2.GLUT;
 
 
 
@@ -29,11 +29,12 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	float Xclick, Yclick;
 	float [] clickDif = {0.0f, 0.0f};
 	boolean animate = true;
-	
+	float test = 12.0f;
 	float focalLength = 20.0f;
 	
 	//angle of rotation
 	float rotate = 0.0f;
+	float worldRotate = 0.0f;
 	float RotationExtra = 0.0f;
 	
 	/*** Define material property  ***/ 
@@ -56,26 +57,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 
 
     private GLU glu = new GLU();
-    private GLUT glut = new GLUT();
-	
-	public void drawTeapot(final GL2 gl){
-		gl.glPushMatrix();
-		
-		// set the shading model GL_SMOOTH /GL_FLAT
-			gl.glShadeModel(GL2.GL_SMOOTH);
-			//gl.glShadeModel(GL2.GL_FLAT);
-		
-		
-		// set the material property
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
-		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, blueMaterial, 0);
-	
-		glut.glutSolidTeapot(5);
-		
-		gl.glPopMatrix();
-		
-	}
+    //private GLUT glut = new GLUT();
 	
 	public void drawAxes(final GL2 gl){
 		gl.glPushMatrix();
@@ -104,7 +86,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, blueMaterial, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, eShininess, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, blueMaterial, 0);
-
+		//gl.glColor3d(0, 1, 0);
 		
 		gl.glRotatef(-12.0f, 0.0f, 0.0f, 1.0f);
 		gl.glRotatef(rotate, 0.0f, 1.0f, 0.0f);
@@ -113,7 +95,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		gl.glRotatef(RotationExtra, 0.0f, 1.0f, 0.0f);//Rotation Extra Credit
 		
 		//glut.glutSolidSphere(0.33,10,10);
-		drawSphere(0.33f, 5, gl);
+		drawSphere(0.33f, 2, gl);
 		
 		gl.glPopMatrix();
 	}
@@ -126,21 +108,25 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, grayMaterial, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, moShininess, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, grayMaterial, 0);
+		//gl.glColor3d(128, 128, 128);
 
 		//Match the Earth
 		gl.glRotatef(-12.0f, 0.0f, 0.0f, 1.0f);
 		gl.glRotatef(rotate, 0.0f, 1.0f, 0.0f);
 		gl.glTranslatef(-5.0f, 0.0f, 0.0f);
+		
+		//undo Earth Rotation
+		gl.glRotatef(-rotate, 0.0f, 1.0f, 0.0f);
 
 		//Moon Rotation
-		gl.glRotatef(12.0f, 0.0f, 0.0f, 1.0f);
-		gl.glRotatef(rotate, 0.0f, 1.0f, 0.0f);
-		gl.glTranslatef(1.0f, 0.0f, 0.0f);
-
+			gl.glRotatef(24, 0.0f, 0.0f, 1.0f);
+			gl.glRotatef(rotate, 0.0f, 1.0f, 0.0f);
+			gl.glTranslatef(1.0f, 0.0f, 0.0f);
+		
 		gl.glRotatef(RotationExtra, 0.0f, 1.0f, 0.0f);//Rotation Extra Credit
 
 		//glut.glutSolidSphere(0.11,10,10);
-		drawSphere(0.11f, 5, gl);
+		drawSphere(0.11f, 2, gl);
 
 		gl.glPopMatrix();
 	}
@@ -154,9 +140,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, Goldlight, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, sShininess, 0);
 		gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT, Goldlight, 0);
+		//gl.glColor3d(1,1,0);
 	
 		gl.glRotatef(RotationExtra, 0.0f, 1.0f, 0.0f);
-		drawSphere(1.0f, 5, gl);
+		drawSphere(1.0f, 2, gl);
 		
 		gl.glPopMatrix();
 	}
@@ -231,12 +218,12 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition_0, 0); // set light0 position
 //			gl.glPopMatrix();
 			
-					
+			gl.glRotatef(worldRotate, 1.0f, 1.0f, 0.0f);
 			drawSun(5.0f, gl);
 			drawEarth(0.33f, gl);
 			drawMoon(0.11f, gl);	
 			drawAxes(gl);
-			RotationExtra+=0.01f;
+			RotationExtra+=0.1f;
 			
 			if(animate == true){
 				if(rotate < 360){
@@ -247,7 +234,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				}
 			}
 	    	
-	    	//drawTeapot(gl);
+//			gl.glDisable(GL2.GL_LIGHTING); // disable lighting
+//			gl.glDisable(GL2.GL_LIGHT0); // disable lighting
 	    	
 	    	gl.glFlush();
 	    	
@@ -282,10 +270,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			
 			if(e.getButton()==MouseEvent.BUTTON1) {	// Left button
 				if(Xdrag > Xclick){
-					  rotate += 1;
+					  worldRotate += 1;
 					}
 					else {
-					  rotate -= 1;
+					  worldRotate -= 1;
 					}
 			}
 			else if(e.getButton()==MouseEvent.BUTTON3) {// Right button
@@ -353,8 +341,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	               float v2x, float v2y, float v2z,
 	               float v3x, float v3y, float v3z,
 	               int level, final GL2 gl) {
-			if (level == 0) {
-					gl.glBegin(GL.GL_TRIANGLES);
+			if (level == 0) {    
+				    gl.glBegin(GL.GL_TRIANGLES);
 					gl.glVertex3f(v1x, v1y, v1z);
 					gl.glVertex3f(v2x, v2y, v2z);
 					gl.glVertex3f(v3x, v3y, v3z);
