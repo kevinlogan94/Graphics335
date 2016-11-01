@@ -142,12 +142,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			drawSkyBox(gl, 10.0f);
 			
 			gl.glPopMatrix();
-			//transform
+
 			//Draw 3D Graphic
-			gl.glRotated(turn, 0, 1, 0);
-			
+			gl.glRotated(turn, 0, 1, 0);	
 			gl.glTranslatef(sidetoside,0,forward);
-			gl.glColor3d(1, 1, 0);
 			drawScene(gl, 2);
 			
 			gl.glPopMatrix();
