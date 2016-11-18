@@ -50,15 +50,15 @@ public class Main extends JFrame implements ActionListener {
         	Minelabel.setText(Integer.toString(mineAmount));    
         }
         
-        ResetBtn = new JButton("Reset");
+        ResetBtn = new JButton();//JButton("Reset")
         ResetBtn.addActionListener(this);
         ResetBtn.setBounds(10,30,80,30);
         
-//        try {
-//            Image img = ImageIO.read(getClass().getResource("Reset.jpeg"));
-//            ResetBtn.setIcon(new ImageIcon(img));
-//          } catch (IOException ex) {
-//          }
+        try {
+            Image img = ImageIO.read(getClass().getResource("Reset.jpg"));
+            ResetBtn.setIcon(new ImageIcon(img));
+          } catch (IOException ex) {
+          }
         
         add(Menu, BorderLayout.PAGE_START);
         add(Minelabel, BorderLayout.AFTER_LINE_ENDS);

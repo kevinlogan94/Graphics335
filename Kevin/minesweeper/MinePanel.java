@@ -3,13 +3,21 @@ package minesweeper;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.IOException;
 import java.util.Random;
 
-import javax.swing.JLabel;
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 public class MinePanel extends JPanel implements ActionListener {
 
@@ -18,6 +26,7 @@ public class MinePanel extends JPanel implements ActionListener {
 	private Block[][] blocks;
 	private Dimension gridSize;
 	private int visibleBlocks;
+	//private MouseAdapter mouseListener;
 	
 	public MinePanel(int mineAmount, int boardWidth, int boardHeight){
 		setBackground(Color.green);
@@ -27,6 +36,17 @@ public class MinePanel extends JPanel implements ActionListener {
 		//setPreferredSize(new Dimension(800,600));
 		setLayout(new GridLayout(gridSize.height,gridSize.width));
 		
+//		mouseListener = new MouseAdapter() {
+//            @Override
+//            public void mouseClicked(MouseEvent e) {
+//                super.mouseClicked(e);
+//                System.out.println("clicked");
+//                if (e.getButton() == MouseButton.BUTTON3)
+//                {
+//                    // Right-click happened
+//                }
+//            }
+//        };
 		
 		totalMines = mineAmount;
 		visibleBlocks = gridSize.width * gridSize.height;
@@ -40,13 +60,15 @@ public class MinePanel extends JPanel implements ActionListener {
 			}
 		}
 		
-		//addMines();
+		addMines();
 		
 		setVisible(true);
 		
 	}
 	
+
 	public void actionPerformed(ActionEvent e) {
+		//((Block)e.getSource()).addMouseListener(mouseListener);
 		try {
 			revealBlock((Block)(e.getSource()));
 			//reset();
@@ -57,11 +79,48 @@ public class MinePanel extends JPanel implements ActionListener {
 		}
 	}
 	
+	//public void MouseListener MouseListener(){}
 	private void revealBlock(Block block){
 		block.setEnabled(false);
 
-		if(block.noMines()){
+		if(block.isMine()){
+			showGameOver();
+		}
+		else if(block.noMines()){
 			revealAdjacent(block);
+		}
+		else{
+			block.setText(Integer.toString(block.getType()));
+		}
+		
+		visibleBlocks--;
+		
+		if (visibleBlocks == totalMines) {
+			showGameOver();
+		}
+		
+	}
+	
+	private void showGameOver() {
+		if (visibleBlocks != totalMines) { //Lose
+			revealMines();
+			JOptionPane.showMessageDialog(this,"Lose");
+		} else {
+			JOptionPane.showMessageDialog(this,"Win");
+		}
+	}
+	
+	private void revealMines() {
+		for (int c = 0; c < gridSize.width; c++) {
+			for (int r = 0; r < gridSize.height; r++) {
+				if(blocks[r][c].isMine()){
+					try {
+			            Image img = ImageIO.read(getClass().getResource("Mine.png"));
+			            blocks[r][c].setIcon(new ImageIcon(img));
+			          } catch (IOException ex) {
+			          }
+				}
+			}
 		}
 	}
 	
@@ -86,13 +145,36 @@ public class MinePanel extends JPanel implements ActionListener {
 		}	
 	}
 	
-	public void reset(){
-		for (int c = 0; c < gridSize.width; c++) {
-			for (int r = 0; r < gridSize.height; r++) {
-				(blocks[r][c]).setEnabled(true);
+	private void addMines() {
+		int mineCount = 0;
+		Random random = new Random();
+		
+		while (mineCount != totalMines) {
+			int r = random.nextInt(blocks.length);//Random based row length
+			int c = random.nextInt(blocks[0].length);//Random based on column length
+//			System.out.println(r);
+//			System.out.println(c);
+			if (!blocks[r][c].isMine()) {
+				blocks[r][c].setMine();
+//				System.out.println("Bomb R" + r);
+//				System.out.println("Bomb R" + c);
+				//Setup adjacent blocks to show number of adjacent mines.
+				for (int row = r-1;row <= r+1; row++) {
+					for (int col = c-1; col <= c+1; col++) {
+						if (row == r && col == c)
+							continue; //Skip Centre
+						if (row < 0 || row > gridSize.height-1 ||col < 0 || col > gridSize.width-1)
+							continue; //Out of Bounds
+						if(!blocks[row][col].isMine()){
+							blocks[row][col].addMine();
+//							System.out.println(row);
+//							System.out.println(col);
+							}
+					}
+				}
+				
+				mineCount++;
 			}
 		}
-		
-		//addMines();
 	}
 }
