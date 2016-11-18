@@ -29,7 +29,7 @@ public class Main extends JFrame implements ActionListener {
 	int boardHeight=8;
 	JLabel Timerlabel;
 	JLabel Minelabel;
-	String[] menuOptions = {"Menu","reset", "exit", "custom"};
+	String[] menuOptions = {"Menu", "New", "Beginner", "Intermediate", "Expert", "Custom", "Exit"};
 	JComboBox Menu;
 
 	public Main() {
@@ -43,7 +43,12 @@ public class Main extends JFrame implements ActionListener {
 		
         setupTimer();
         Minelabel = new JLabel();
-        Minelabel.setText(Integer.toString(mineAmount));    
+        if(mineAmount < 100){
+        	Minelabel.setText("0" + Integer.toString(mineAmount)); 
+        }
+        else{
+        	Minelabel.setText(Integer.toString(mineAmount));    
+        }
         
         ResetBtn = new JButton("Reset");
         ResetBtn.addActionListener(this);
@@ -55,14 +60,14 @@ public class Main extends JFrame implements ActionListener {
 //          } catch (IOException ex) {
 //          }
         
-        add(Menu, BorderLayout.LINE_START);
+        add(Menu, BorderLayout.PAGE_START);
         add(Minelabel, BorderLayout.AFTER_LINE_ENDS);
-        add(Timerlabel, BorderLayout.PAGE_START);
+        add(Timerlabel, BorderLayout.LINE_START);
         add(ResetBtn, BorderLayout.PAGE_END);
         add(Board, BorderLayout.CENTER);
         
         
-		setSize(500, 255);
+		setSize(750, 500);
 		setLocation(100, 100);
 		setVisible(true);
 	}
@@ -73,20 +78,23 @@ public class Main extends JFrame implements ActionListener {
 	
 	public void actionPerformed( ActionEvent e ){
 		//JButton btn = (JButton) e.getSource();
+		//If a Resetbtn is pressed
 		if(e.getSource() == ResetBtn){
-			Board.reset();
-//			remove(Board);
-//			Board = new MinePanel(mineAmount);
-//			add(Board, BorderLayout.CENTER);
-			
+			//Board.reset();
+			createDifGame("");
 		}
+		
+		//If menu is pressed
 		if(e.getSource() == Menu){
 			JComboBox cb = (JComboBox)e.getSource();
 			String option = (String)cb.getSelectedItem();
 			
-			if(option == "custom"){
-				createCustom();
-			}
+			//Create a new game
+			if(option != "Exit" && option != "Menu")
+				createDifGame(option);
+			
+			if(option=="Exit")
+				System.exit(0);
 		}
 	}
 	
@@ -109,26 +117,50 @@ public class Main extends JFrame implements ActionListener {
   	    timer.start();
 	}
 	
-	public void createCustom(){
-		@SuppressWarnings("resource")
-		Scanner scanner = new Scanner(System.in);
+	public void createDifGame(String option){
+		if(option=="Beginner"){
+			mineAmount=10;
+			boardWidth=8;
+			boardHeight=8;
+		}
+		else if(option=="Intermediate"){
+			mineAmount=40;
+			boardWidth=16;
+			boardHeight=16;
+		}
+		else if(option=="Expert"){
+			mineAmount=99;
+			boardWidth=32;
+			boardHeight=32;
+		}
+		else if(option=="Custom"){
+			@SuppressWarnings("resource")
+			Scanner scanner = new Scanner(System.in);
 
-		//Request mines for game.
-		System.out.println("How many Mines?");
-		mineAmount = scanner.nextInt();
+			//Request mines for game.
+			System.out.println("How many Mines?");
+			mineAmount = scanner.nextInt();
 
-		//Request size.
-		System.out.println("Board Width?");
-		boardWidth = scanner.nextInt();
+			//Request size.
+			System.out.println("Board Width?");
+			boardWidth = scanner.nextInt();
 
-		System.out.println("Board Height?");
-		boardHeight = scanner.nextInt();
+			System.out.println("Board Height?");
+			boardHeight = scanner.nextInt();
+		}
 		
 		//Set up new custom game
 		seconds=0;
 		remove(Board);
 		Board = new MinePanel(mineAmount, boardWidth, boardHeight);
 		add(Board, BorderLayout.CENTER);
-		Minelabel.setText(Integer.toString(mineAmount)); 
+		
+		//Set mineAmount
+		if(mineAmount < 100){
+        	Minelabel.setText("0" + Integer.toString(mineAmount)); 
+        }
+        else{
+        	Minelabel.setText(Integer.toString(mineAmount));    
+        }
 	}
 }
