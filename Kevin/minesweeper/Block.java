@@ -20,7 +20,6 @@ public class Block extends JButton{
 	}
 	
 	public void setMine() { type = 9; }
-	
 	public boolean isMine() { return type == 9 ? true : false; }
 	public boolean noMines() { return type == 0 ? true : false; }
 

@@ -26,7 +26,6 @@ public class MinePanel extends JPanel implements ActionListener {
 	private Block[][] blocks;
 	private Dimension gridSize;
 	private int visibleBlocks;
-	//private MouseAdapter mouseListener;
 	
 	public MinePanel(int mineAmount, int boardWidth, int boardHeight){
 		setBackground(Color.green);
@@ -36,18 +35,6 @@ public class MinePanel extends JPanel implements ActionListener {
 		//setPreferredSize(new Dimension(800,600));
 		setLayout(new GridLayout(gridSize.height,gridSize.width));
 		
-//		mouseListener = new MouseAdapter() {
-//            @Override
-//            public void mouseClicked(MouseEvent e) {
-//                super.mouseClicked(e);
-//                System.out.println("clicked");
-//                if (e.getButton() == MouseButton.BUTTON3)
-//                {
-//                    // Right-click happened
-//                }
-//            }
-//        };
-		
 		totalMines = mineAmount;
 		visibleBlocks = gridSize.width * gridSize.height;
 		
@@ -56,22 +43,33 @@ public class MinePanel extends JPanel implements ActionListener {
 			for (int r = 0; r < gridSize.height; r++) {
 				blocks[r][c] = new Block(r,c);
 				blocks[r][c].addActionListener(this);
+				blocks[r][c].addMouseListener(mouseListener);
 				add(blocks[r][c]);
 			}
 		}
 		
-		addMines();
-		
+		addMines();	
 		setVisible(true);
 		
 	}
 	
+	MouseAdapter mouseListener = new MouseAdapter() {
+		 public void mousePressed(MouseEvent mouseEvent) {
+		        if (SwingUtilities.isRightMouseButton(mouseEvent)) {
+		          try {
+		  			flagBlock((Block)(mouseEvent.getSource()));
+		  		  } catch(Exception exc) {
+		  			System.err.println(
+		  				exc.getMessage()+"Board's ActionListener only for Block objects"
+		  			);
+		  		  }
+		        }
+		 }
+   };
 
 	public void actionPerformed(ActionEvent e) {
-		//((Block)e.getSource()).addMouseListener(mouseListener);
 		try {
 			revealBlock((Block)(e.getSource()));
-			//reset();
 		} catch(Exception exc) {
 			System.err.println(
 				exc.getMessage()+"Board's ActionListener only for Block objects"
@@ -92,11 +90,23 @@ public class MinePanel extends JPanel implements ActionListener {
 		else{
 			block.setText(Integer.toString(block.getType()));
 		}
-		
+
 		visibleBlocks--;
-		
 		if (visibleBlocks == totalMines) {
 			showGameOver();
+		}
+
+
+	}
+	
+	private void flagBlock(Block block){
+		if(block.isEnabled()){
+			try {
+	            Image img = ImageIO.read(getClass().getResource("Flag.png"));
+	            block.setIcon(new ImageIcon(img));
+	            block.setEnabled(false);
+	          } catch (IOException ex) {
+	          }
 		}
 		
 	}
@@ -152,12 +162,8 @@ public class MinePanel extends JPanel implements ActionListener {
 		while (mineCount != totalMines) {
 			int r = random.nextInt(blocks.length);//Random based row length
 			int c = random.nextInt(blocks[0].length);//Random based on column length
-//			System.out.println(r);
-//			System.out.println(c);
 			if (!blocks[r][c].isMine()) {
 				blocks[r][c].setMine();
-//				System.out.println("Bomb R" + r);
-//				System.out.println("Bomb R" + c);
 				//Setup adjacent blocks to show number of adjacent mines.
 				for (int row = r-1;row <= r+1; row++) {
 					for (int col = c-1; col <= c+1; col++) {
@@ -167,8 +173,6 @@ public class MinePanel extends JPanel implements ActionListener {
 							continue; //Out of Bounds
 						if(!blocks[row][col].isMine()){
 							blocks[row][col].addMine();
-//							System.out.println(row);
-//							System.out.println(col);
 							}
 					}
 				}
