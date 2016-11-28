@@ -12,7 +12,7 @@ import java.io.File;
 import com.jogamp.opengl.*;
 import com.jogamp.opengl.glu.GLU;
 import com.jogamp.opengl.util.texture.*;
-
+import com.jogamp.opengl.util.gl2.GLUT;
 
 
 public class JoglEventListener implements GLEventListener, KeyListener, MouseListener, MouseMotionListener {
@@ -26,6 +26,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	float[] movement= {0, 0};
 	float [] mouse_last = {0, 0};
 	float [] drag_amount = {0, 0};
+	boolean ballVisible = false;
 	Texture mytex = null; 
 	Texture myHUD = null;
 	Texture myGround = null;
@@ -33,8 +34,12 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	Texture myBuildingFace1 = null;
 	Texture myBuildingFace2 = null;
 	Texture myBuildings = null;
+	Texture myGoal = null;
+	Texture myUDLR = null;
+	Texture myLR = null;
 
     private GLU glu = new GLU();
+    private GLUT glut = new GLUT();
 
 	
 	public void displayChanged(GLAutoDrawable gLDrawable, 
@@ -57,18 +62,22 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        // load the texture;
 	        
 	        try {
-	        	 mytex = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Evan/Program4/skybox2.jpg"), false);
-	        	 myHUD = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Evan/Program4/HUD2.png"), false);
-	        	 myGround = TextureIO.newTexture(new File("/Users/epheat07/Desktop/basketball_textures/textures/grass.png"), false);
-	        	 myCourt = TextureIO.newTexture(new File("/Users/epheat07/Desktop/basketball_textures/textures/court2.png"), false);
-	        	 myBuildingFace1 = TextureIO.newTexture(new File("/Users/epheat07/Desktop/basketball_textures/textures/building1.png"), false);
-	        	 myBuildingFace2 = TextureIO.newTexture(new File("/Users/epheat07/Desktop/basketball_textures/textures/building2.png"), false);
-	        	 myBuildings = TextureIO.newTexture(new File("/Users/epheat07/Desktop/basketball_textures/textures/buildings_small.png"), false);
-
+	        	 mytex = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"), false);
+	        	 myHUD = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/HUD2.png"), false);
+	        	 myGround = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/grass.png"), false);
+	        	 myCourt = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/court2.png"), false);
+	        	 myBuildingFace1 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/building1.png"), false);
+	        	 myBuildingFace2 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/building2.png"), false);
+	        	 myBuildings = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/buildings_small.png"), false);
+	        	 myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/goal.jpg"), false);
+	        	 myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/udlr.png"), false);
+	        	 myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/lr.png"), false);
 	        	 
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
 	             gl.glEnable(GL.GL_TEXTURE_2D);
+	             myGoal.bind(gl);
+	             myUDLR.bind(gl);
 	             mytex.bind(gl);
 	             //gl.glBindTexture(GL.GL_TEXTURE_2D, texID);
 	        	 gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
@@ -503,30 +512,117 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glDisable(GL.GL_TEXTURE_2D);
 	    	gl.glPopMatrix();
 		}
-	    public void drawCourt(final GL2 gl) {
+		public void drawCourt(final GL2 gl) {
 			gl.glPushMatrix();
-	    	gl.glEnable(GL.GL_TEXTURE_2D);
-	    	myCourt.bind(gl);
-	    	gl.glBegin(GL2.GL_QUADS);
-	    	
-	    	gl.glTexCoord2f(0, 0);
-	    	gl.glVertex3f(-6, 0, -10.5f);
-	    	
-	    	gl.glTexCoord2f(0, 1);
-	    	gl.glVertex3f(-6, 0, 10.5f);
-	    	
-	    	gl.glTexCoord2f(1, 1);
-	    	gl.glVertex3f(6, 0, 10.5f);
-	    	
-	    	gl.glTexCoord2f(1, 0);
-	    	gl.glVertex3f(6, 0, -10.5f);
-	    	
-	    	
-	    	
-	    	gl.glEnd();
-	    	gl.glDisable(GL.GL_TEXTURE_2D);
-	    	gl.glPopMatrix();
+			gl.glEnable(GL.GL_TEXTURE_2D);
+			myCourt.bind(gl);
+			gl.glBegin(GL2.GL_QUADS);
+
+			gl.glTexCoord2f(0, 0);
+			gl.glVertex3f(-6, 0, -10.5f);
+
+			gl.glTexCoord2f(0, 1);
+			gl.glVertex3f(-6, 0, 10.5f);
+
+			gl.glTexCoord2f(1, 1);
+			gl.glVertex3f(6, 0, 10.5f);
+
+			gl.glTexCoord2f(1, 0);
+			gl.glVertex3f(6, 0, -10.5f);
+
+
+
+			gl.glEnd();
+			gl.glDisable(GL.GL_TEXTURE_2D);
+			gl.glPopMatrix();
 		}
+	   public void drawGoal(final GL2 gl){
+		   gl.glPushMatrix();
+		   gl.glTranslated(0,4,-10);
+		   gl.glPushMatrix();
+		   	gl.glRotated(90, 1, 0, 0);
+		   	gl.glColor3d(0, 0, 0);
+		   	glut.glutSolidCylinder(0.1f, 4, 20, 20);
+		   	gl.glPushMatrix();
+		   	    gl.glTranslated(0, 0.8, 0.04);
+		   	    gl.glColor3d(255, 0, 0); 
+		    	glut.glutSolidTorus(0.02, 0.4, 5, 25);
+		   	gl.glPopMatrix();
+		   gl.glPopMatrix();	   
+		   //glut.glutSolidCube(1);
+		   gl.glPopMatrix();
+		   drawBackBoard(gl);
+	   }
+	   public void drawBackBoard(final GL2 gl){
+		   gl.glPushMatrix();
+		   gl.glEnable(GL.GL_TEXTURE_2D);
+		   myGoal.bind(gl);
+		   gl.glBegin(GL2.GL_QUADS);
+
+		   //front
+		   gl.glTexCoord2f(0, 0);
+		   gl.glVertex3f(-1, 3.8f, -9.6f);
+		   gl.glTexCoord2f(0, 1);
+		   gl.glVertex3f(-1, 5, -9.6f);
+		   gl.glTexCoord2f(1, 1);
+		   gl.glVertex3f(1, 5, -9.6f);
+		   gl.glTexCoord2f(1, 0);
+		   gl.glVertex3f(1, 3.8f, -9.6f);
+
+		   //right
+		   gl.glVertex3f(1, 3.8f, -9.6f);
+		   gl.glVertex3f(1, 5, -9.6f);
+		   gl.glVertex3f(1, 5, -9.7f);
+		   gl.glVertex3f(1, 3.8f, -9.7f);
+
+		   //back
+		   gl.glVertex3f(-1, 3.8f, -9.7f);
+		   gl.glVertex3f(-1, 5, -9.7f);
+		   gl.glVertex3f(1, 5, -9.7f);
+		   gl.glVertex3f(1, 3.8f, -9.7f);
+
+		   //left
+		   gl.glVertex3f(-1, 3.8f, -9.6f);
+		   gl.glVertex3f(-1, 5, -9.6f);
+		   gl.glVertex3f(-1, 5, -9.7f);
+		   gl.glVertex3f(-1, 3.8f, -9.7f);
+
+		   gl.glEnd();
+		   gl.glDisable(GL.GL_TEXTURE_2D);
+		   gl.glPopMatrix();
+	   }
+	   public void drawArrows(final GL2 gl){
+		   gl.glPushMatrix();
+		   gl.glEnable(GL.GL_TEXTURE_2D);
+		   myUDLR.bind(gl);
+		   gl.glBegin(GL2.GL_QUADS);
+		   //front
+		   gl.glTexCoord2f(0, 0);
+		   gl.glVertex3f(-0.7f, -0.45f, -1);
+		   gl.glTexCoord2f(0, 1);
+		   gl.glVertex3f(-0.7f, -0.05f, -1);
+		   gl.glTexCoord2f(1, 1);
+		   gl.glVertex3f(-0.3f, -0.05f, -1);
+		   gl.glTexCoord2f(1, 0);
+		   gl.glVertex3f(-0.3f, -0.45f, -1);
+		   gl.glEnd();
+		   
+		   myLR.bind(gl);
+		   gl.glBegin(GL2.GL_QUADS);
+		   //front
+		   gl.glTexCoord2f(0, 0);
+		   gl.glVertex3f(0.35f, -0.4f, -1);
+		   gl.glTexCoord2f(0, 1);
+		   gl.glVertex3f(0.35f, -0.1f, -1);
+		   gl.glTexCoord2f(1, 1);
+		   gl.glVertex3f(0.65f, -0.1f, -1);
+		   gl.glTexCoord2f(1, 0);
+		   gl.glVertex3f(0.65f, -0.4f, -1);
+		   gl.glEnd();
+		   
+		   gl.glDisable(GL.GL_TEXTURE_2D);
+		   gl.glPopMatrix();
+	   }
 
 		
 	    @Override
@@ -548,17 +644,23 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			
 			renderSkyBox(gl);
-			
 	        gl.glRotatef(-rot, 0.0f, 1.0f, 0.0f);
 	        gl.glTranslated(movement[1], -0.5, movement[0]);
 	        
+	        drawGoal(gl);
 	        drawGround(gl);
 	        drawCourt(gl);
 	        drawBuildings(gl);
 			
-			gl.glPopMatrix();
-			
+			gl.glPopMatrix();	
+			drawArrows(gl);
 	        drawHUD(gl);
+	        
+	        if(ballVisible){
+	          gl.glTranslated(0,0,-2);
+	          gl.glColor3d(255, 140, 0);
+	          glut.glutSolidSphere(0.5f, 30, 30);
+	        }	        
 		}
 
 		@Override
@@ -624,7 +726,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		@Override
 		public void keyTyped(KeyEvent e) {
 			// TODO Auto-generated method stub
-			
+			char key= e.getKeyChar();
+			if (key == ' ') {
+				ballVisible=true;
+		    }
 		}
 
 		@Override
@@ -644,6 +749,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			} else if (key == 'r') {
 				System.out.println(rot);
 			}
+			
 		}
 
 		@Override
