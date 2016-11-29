@@ -42,7 +42,7 @@ public class EntryClass extends Frame {
 	}
 	
     public EntryClass() {
-        super("Class Demo");
+        super("Free Throw");
 
         setLayout(new BorderLayout());
         

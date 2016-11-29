@@ -26,7 +26,12 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	float[] movement= {0, 0};
 	float [] mouse_last = {0, 0};
 	float [] drag_amount = {0, 0};
-	boolean ballVisible = false;
+	float power = 0.0f;
+	float velocity = 0.0f;
+	int hitRightMeter = 0;
+	int hitLeftMeter = 0;
+	boolean powerGrowth = false;
+	boolean gameTrigger = false;
 	Texture mytex = null; 
 	Texture myHUD = null;
 	Texture myGround = null;
@@ -37,6 +42,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	Texture myGoal = null;
 	Texture myUDLR = null;
 	Texture myLR = null;
+	Texture myMeter = null;
 
     private GLU glu = new GLU();
     private GLUT glut = new GLUT();
@@ -72,6 +78,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        	 myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/goal.jpg"), false);
 	        	 myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/udlr.png"), false);
 	        	 myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/lr.png"), false);
+	        	 myMeter = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/meter.png"), false);
 	        	 
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
@@ -79,6 +86,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	             myGoal.bind(gl);
 	             myUDLR.bind(gl);
 	             mytex.bind(gl);
+	             myMeter.bind(gl);
 	             //gl.glBindTexture(GL.GL_TEXTURE_2D, texID);
 	        	 gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MIN_FILTER, GL.GL_LINEAR);
 	             gl.glTexParameteri(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_MAG_FILTER, GL.GL_LINEAR);
@@ -623,6 +631,61 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		   gl.glDisable(GL.GL_TEXTURE_2D);
 		   gl.glPopMatrix();
 	   }
+	   public void drawMeter(final GL2 gl){
+		   gl.glPushMatrix();
+		   
+		   gl.glEnable(GL.GL_TEXTURE_2D);
+		   myMeter.bind(gl);
+		   gl.glBegin(GL2.GL_QUADS);
+
+		   gl.glTexCoord2f(0, 0);
+		   gl.glVertex3f(-0.2f, -0.3f, -1);
+		   gl.glTexCoord2f(0, 1);
+		   gl.glVertex3f(-0.2f, -0.2f, -1);
+		   gl.glTexCoord2f(1, 1);
+		   gl.glVertex3f(0.2f, -0.2f, -1);
+		   gl.glTexCoord2f(1, 0);
+		   gl.glVertex3f(0.2f, -0.3f, -1);
+		   gl.glEnd();
+		   gl.glDisable(GL.GL_TEXTURE_2D);
+		   
+		   gl.glTranslated(power, 0, 0);
+		   
+		   gl.glEnable(GL2.GL_LINE_SMOOTH);
+		   gl.glColor3f(0.0f, 0.0f, 0.0f);
+		   gl.glBegin(GL2.GL_LINES);
+		   gl.glVertex3f(-0.195f, -0.3f, -1);
+		   gl.glVertex3f(-0.195f, -0.2f, -1);
+		   gl.glEnd();
+		   
+		   gl.glPopMatrix();
+	   }
+	   public void drawVelocityMeter(final GL2 gl){
+		   if(gameTrigger){
+			   drawMeter(gl);
+			   if(powerGrowth){
+				   //Determine which direction for the line to translate
+				   if(hitRightMeter >= 2 && hitLeftMeter >= 1)
+					   System.out.println("You Lose");
+				   else if((hitRightMeter == 0 && hitLeftMeter == 0) || (hitRightMeter == 1 && hitLeftMeter == 1))  
+					   power += 0.01f;
+				   else
+					   power -= 0.01f;
+
+				   //Increment if right or left side of bar is hit
+				   if(power >= 2*(0.195f))
+					   hitRightMeter++;
+				   if(power <= 0)
+					   hitLeftMeter++;
+			   }
+			   else{
+				   velocity = ((power *(1000))/3.9f);
+				   System.out.println("Velocity: " + velocity);
+			   }
+			   //		          gl.glColor3d(255, 140, 0);
+			   //		          glut.glutSolidSphere(0.5f, 30, 30);
+		   }	        
+	   }
 
 		
 	    @Override
@@ -631,7 +694,11 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			final GL2 gl = gLDrawable.getGL().getGL2();
 			
 			movement[0] += (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
-			movement[1] += (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
+			//movement[1] += (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
+			if(movement_state[1] == 1)
+				movement[1] += 0.25;
+			if(movement_state[1] == -1)
+				movement[1] -= 0.25;
 			rot += drag_amount[0];
 			y_lookat -= drag_amount[1]/10;
 			
@@ -655,12 +722,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glPopMatrix();	
 			drawArrows(gl);
 	        drawHUD(gl);
+	        drawVelocityMeter(gl);
 	        
-	        if(ballVisible){
-	          gl.glTranslated(0,0,-2);
-	          gl.glColor3d(255, 140, 0);
-	          glut.glutSolidSphere(0.5f, 30, 30);
-	        }	        
 		}
 
 		@Override
@@ -691,7 +754,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		@Override
 		public void mouseClicked(MouseEvent e) {
 			// TODO Auto-generated method stub
-			
+			float XX = (e.getX()-windowWidth*0.5f)*orthoX/windowWidth;
+			float YY = -(e.getY()-windowHeight*0.5f)*orthoX/windowWidth;
+			System.out.println(XX);
+			System.out.println(YY);
 		}
 
 		@Override
@@ -702,6 +768,25 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			
 			mouse_last[0] = XX;
 			mouse_last[1] = YY;
+			
+			//look up
+			if(YY > -5.45 && YY < -1.5 && XX > -15 && XX < -11.4)
+				drag_amount[1] = -1;
+			//look right
+			if(XX > -12 && XX < -8 && YY < -4.85 && YY > -8.6)
+				drag_amount[0] = -1;
+			//look left
+			if(XX > -18.7 && XX < -14.7 && YY < -4.85 && YY > -8.6)
+				drag_amount[0] = 1;
+			//look down
+			if(YY > -12 && YY < -8.15 && XX > -15 && XX < -11.4)
+				drag_amount[1] = 1;
+			//left
+			if(XX < 13.5 && XX > 9.8 && YY < -4.6 && YY > -8.3)
+				movement_state[1] = 1;
+			//right
+			if(XX < 17 && XX > 13.5 && YY < -4.6 && YY > -8.3)
+				movement_state[1] = -1;
 		}
 
 		@Override
@@ -709,6 +794,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			// TODO Auto-generated method stub
 			drag_amount[0] = 0;
 			drag_amount[1] = 0;
+			movement_state[1] = 0;
 		}
 
 		@Override
@@ -728,7 +814,13 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			// TODO Auto-generated method stub
 			char key= e.getKeyChar();
 			if (key == ' ') {
-				ballVisible=true;
+				if(!gameTrigger){
+					gameTrigger=true;
+					powerGrowth=true;
+				}
+				else{
+					powerGrowth=false;	
+				}
 		    }
 		}
 
@@ -739,16 +831,25 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			System.out.printf("Key pressed: %c\n", key);
 			
 			if (key == 'w') {
-				movement_state[0] = 1;
+				//movement_state[0] = 1;
+				drag_amount[1] = -1;
 			} else if (key == 'a') {
-				movement_state[1] = 1;
+				//movement_state[1] = 1;
+				drag_amount[0] = 1;
 			} else if (key == 's') {
-				movement_state[0] = -1;
+				//movement_state[0] = -1;
+				drag_amount[1] = 1;
 			} else if (key == 'd') {
-				movement_state[1] = -1;
+				//movement_state[1] = -1;
+				drag_amount[0] = -1;
 			} else if (key == 'r') {
 				System.out.println(rot);
 			}
+			
+			 if (e.getKeyCode()  == KeyEvent.VK_RIGHT )
+		            movement_state[1] = -1;
+			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
+		            movement_state[1] = 1;
 			
 		}
 
@@ -759,14 +860,23 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			System.out.printf("Key released: %c\n", key);
 			
 			if (key == 'w') {
-				movement_state[0] = 0;
+				//movement_state[0] = 0;
+				drag_amount[1] = 0;
 			} else if (key == 'a') {
-				movement_state[1] = 0;
+				//movement_state[1] = 0;
+				drag_amount[0] = 0;
 			} else if (key == 's') {
-				movement_state[0] = 0;
+				//movement_state[0] = 0;
+				drag_amount[1] = 0;
 			} else if (key == 'd') {
-				movement_state[1] = 0;
+				//movement_state[1] = 0;
+				drag_amount[0] = 0;
 			}
+			
+			 if (e.getKeyCode()  == KeyEvent.VK_RIGHT )
+		            movement_state[1] = 0;
+			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
+		            movement_state[1] = 0;
 		}
 
 	  /*  
