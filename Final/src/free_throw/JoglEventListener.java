@@ -32,6 +32,16 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	int hitLeftMeter = 0;
 	boolean powerGrowth = false;
 	boolean gameTrigger = false;
+	
+	float[] ball_initial = {0, 0, 0};
+	float[] ball_translation = {0, 0, 0};
+	float[] initial_velocity = {0, 0, 0};
+	float ball_alpha = 0;
+	float ball_size = 0.3f;
+	float time_passed = 0;
+	float time_increment = 0;
+	
+	
 	Texture mytex = null; 
 	Texture myHUD = null;
 	Texture myGround = null;
@@ -68,17 +78,20 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        // load the texture;
 	        
 	        try {
-	        	 mytex = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"), false);
-	        	 myHUD = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/HUD2.png"), false);
-	        	 myGround = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/grass.png"), false);
-	        	 myCourt = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/court2.png"), false);
-	        	 myBuildingFace1 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/building1.png"), false);
-	        	 myBuildingFace2 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/building2.png"), false);
-	        	 myBuildings = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/buildings_small.png"), false);
-	        	 myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/goal.jpg"), false);
-	        	 myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/udlr.png"), false);
-	        	 myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/lr.png"), false);
-	        	 myMeter = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/basketball_textures/textures/meter.png"), false);
+	        	
+	        	// "/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"
+	        	// "/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"
+	        	 mytex = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"), false);
+	        	 myHUD = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/HUD2.png"), false);
+	        	 myGround = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/grass.png"), false);
+	        	 myCourt = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/court2.png"), false);
+	        	 myBuildingFace1 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building1.png"), false);
+	        	 myBuildingFace2 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building2.png"), false);
+	        	 myBuildings = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/buildings_small.png"), false);
+	        	 myGoal = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/goal.jpg"), false);
+	        	 myUDLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/udlr.png"), false);
+	        	 myLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/lr.png"), false);
+	        	 myMeter = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/meter.png"), false);
 	        	 
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
@@ -176,7 +189,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    }
 	    public void renderSkyBox(final GL2 gl) {
 	    	gl.glPushMatrix();
-	    	gl.glRotatef(-rot, 0.0f, 1.0f, 0.0f);
+	    	gl.glRotatef(rot, 0.0f, 1.0f, 0.0f);
 	    	gl.glEnable(GL.GL_TEXTURE_2D);
 	    	mytex.bind(gl);
 	    	drawSkyBox(gl);
@@ -272,6 +285,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			
 	    	gl.glPopMatrix();
 	    }
+	    
 	    public void drawQuad(final GL2 gl) {
 	    	gl.glPushMatrix();
 	        gl.glEnable(GL.GL_TEXTURE_2D);
@@ -544,26 +558,26 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glDisable(GL.GL_TEXTURE_2D);
 			gl.glPopMatrix();
 		}
-	   public void drawGoal(final GL2 gl){
-		   gl.glPushMatrix();
-		   gl.glTranslated(0,4,-10);
-		   gl.glPushMatrix();
+		public void drawGoal(final GL2 gl){
+			gl.glPushMatrix();
+			gl.glTranslated(0,4,-10);
+			gl.glPushMatrix();
 		   	gl.glRotated(90, 1, 0, 0);
 		   	gl.glColor3d(0, 0, 0);
 		   	glut.glutSolidCylinder(0.1f, 4, 20, 20);
 		   	gl.glPushMatrix();
-		   	    gl.glTranslated(0, 0.8, 0.04);
-		   	    gl.glColor3d(255, 0, 0); 
-		    	glut.glutSolidTorus(0.02, 0.4, 5, 25);
+		   	gl.glTranslated(0, 0.8, 0.04);
+		   	gl.glColor3d(255, 0, 0); 
+		   	glut.glutSolidTorus(0.02, 0.4, 5, 25);
 		   	gl.glPopMatrix();
-		   gl.glPopMatrix();	   
-		   //glut.glutSolidCube(1);
-		   gl.glPopMatrix();
-		   drawBackBoard(gl);
+		   	gl.glPopMatrix();	   
+		   	//glut.glutSolidCube(1);
+		   	gl.glPopMatrix();
+		   	drawBackBoard(gl);
 	   }
-	   public void drawBackBoard(final GL2 gl){
-		   gl.glPushMatrix();
-		   gl.glEnable(GL.GL_TEXTURE_2D);
+		public void drawBackBoard(final GL2 gl){
+			gl.glPushMatrix();
+			gl.glEnable(GL.GL_TEXTURE_2D);
 		   myGoal.bind(gl);
 		   gl.glBegin(GL2.GL_QUADS);
 
@@ -678,28 +692,98 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				   if(power <= 0)
 					   hitLeftMeter++;
 			   }
-			   else{
-				   velocity = ((power *(1000))/3.9f);
-				   System.out.println("Velocity: " + velocity);
-			   }
 			   //		          gl.glColor3d(255, 140, 0);
 			   //		          glut.glutSolidSphere(0.5f, 30, 30);
 		   }	        
 	   }
 
-		
+	    public void resetGame() {
+	    	movement[0] = 0;
+	    	movement[1] = 0;
+	    	initial_velocity[0] = 0;
+	    	initial_velocity[1] = 0;
+	    	initial_velocity[2] = 0;
+	    	ball_translation[0] = 0;
+	    	ball_translation[1] = 0;
+	    	ball_translation[2] = 0;
+	    	rot = 0;
+	    	y_lookat = 0;
+	    	gameTrigger = false;
+	    	powerGrowth = false;
+	    	power = 0;
+	    	hitRightMeter = 0;
+	    	hitLeftMeter = 0;
+	    	velocity = 0;
+	    	ball_alpha = 0;
+	    	time_passed = 0;
+	    	
+	    	System.out.println("reset");
+	    }
+	    public void shootBall() {
+	    	//move ball to player location
+	    	ball_initial[0] = -movement[1];
+	    	ball_initial[1] = 1.6f;
+	    	ball_initial[2] = movement[0];
+	    	
+	    	//get initial velocity
+			velocity = ((power *(200))/3.9f);
+	    	
+	    	//make ball visible
+	    	ball_alpha = 1;
+	    	time_increment = 0.01f;
+	    	
+	    
+	    	//calculate initial velocities
+	    	float ud_angle = (float)Math.atan(y_lookat/10);
+//	    	System.out.println("ud_angle (degrees) = " + ud_angle/Math.PI * 180);
+	    	initial_velocity[1] = (float) (velocity * Math.sin(ud_angle));
+//	    	System.out.println("velocity = " + velocity);
+//	    	System.out.println("initial_velocity[1] = " + initial_velocity[1]);
+	    	float v_xz = (float) (velocity * Math.cos(ud_angle));
+	    	float lr_angle = (float)(rot*Math.PI/180);
+//	    	System.out.println("rot = " + rot);
+	    	initial_velocity[0] = (float) (v_xz * Math.sin(lr_angle));
+//	    	System.out.println("initial_velocity[0] = " + initial_velocity[0]);
+	    	initial_velocity[2] = (float) (-v_xz * Math.cos(lr_angle));
+//	    	System.out.println("initial_velocity[2] = " + initial_velocity[2]);
+	    }
+	    
+	    public void drawBall(final GL2 gl) {
+	    	gl.glEnable(gl.GL_BLEND);
+	    	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
+	    	
+	    	gl.glPushMatrix();
+	    	
+	    	updateBallLocation();
+	    	
+	    	gl.glTranslatef(ball_initial[0] + ball_translation[0], ball_initial[1] + ball_translation[1], ball_initial[2] + ball_translation[2]);
+	    	gl.glColor4f(1, 0.45f, 0, ball_alpha);
+	    	
+	    	glut.glutSolidSphere(ball_size, 10, 10);
+	    	
+	    	gl.glPopMatrix();
+	    }
+	    public void updateBallLocation() {
+	    	
+	    	ball_translation[0] = initial_velocity[0] * time_passed;
+	    	ball_translation[1] = (initial_velocity[1] * time_passed) - (9.8f/2 * time_passed * time_passed);
+	    	ball_translation[2] = initial_velocity[2] * time_passed;	
+	    	
+	    	time_passed += time_increment;
+	    }
+	    
 	    @Override
 		public void display(GLAutoDrawable gLDrawable) {
 			// TODO Auto-generated method stub
 			final GL2 gl = gLDrawable.getGL().getGL2();
 			
-			movement[0] += (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
+			//movement[0] += (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
 			//movement[1] += (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
 			if(movement_state[1] == 1)
-				movement[1] += 0.25;
+				movement[1] += 0.1;
 			if(movement_state[1] == -1)
-				movement[1] -= 0.25;
-			rot += drag_amount[0];
+				movement[1] -= 0.1;
+			rot -= drag_amount[0];
 			y_lookat -= drag_amount[1]/10;
 			
 			gl.glLoadIdentity();
@@ -711,13 +795,14 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
 			
 			renderSkyBox(gl);
-	        gl.glRotatef(-rot, 0.0f, 1.0f, 0.0f);
+	        gl.glRotatef(rot, 0.0f, 1.0f, 0.0f);
 	        gl.glTranslated(movement[1], -0.5, movement[0]);
 	        
 	        drawGoal(gl);
 	        drawGround(gl);
 	        drawCourt(gl);
 	        drawBuildings(gl);
+	        drawBall(gl);
 			
 			gl.glPopMatrix();	
 			drawArrows(gl);
@@ -725,6 +810,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        drawVelocityMeter(gl);
 	        
 		}
+	    
+
 
 		@Override
 		public void dispose(GLAutoDrawable arg0) {
@@ -819,8 +906,13 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 					powerGrowth=true;
 				}
 				else{
-					powerGrowth=false;	
+					powerGrowth=false;
+					shootBall();
 				}
+		    } else if (key == 'r') {
+		    	resetGame();
+		    } else if (key == 'f') {
+		    	updateBallLocation();
 		    }
 		}
 
