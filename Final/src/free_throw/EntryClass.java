@@ -2,22 +2,22 @@ package free_throw;
 
 import java.awt.BorderLayout;
 import java.awt.Frame;
+
 import com.jogamp.opengl.awt.GLCanvas;
 import com.jogamp.opengl.GLCapabilities;
-
 import com.jogamp.opengl.util.Animator;
+
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.File;
 
-
-
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 
 
 public class EntryClass extends Frame {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 	static Animator anim = null;
 	
@@ -46,9 +46,6 @@ public class EntryClass extends Frame {
 
         setLayout(new BorderLayout());
         
-        
-        
-     
         addWindowListener(new WindowAdapter()
         {
             public void windowClosing(WindowEvent e)
@@ -67,8 +64,8 @@ public class EntryClass extends Frame {
 
     public static void main(String[] args) {
     	EntryClass demo = new EntryClass();
-
         demo.setVisible(true);
+        JoglEventListener.playSound("birds.wav");
     }
 }
 
