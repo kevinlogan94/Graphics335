@@ -39,19 +39,23 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	boolean gameover = false;
 	boolean backboardHit = false;
 	boolean exploding = false;
+	int ground_bounces = 0;
 	
 	float[] ball_initial = {0, 0, 0};
 	float[] ball_translation = {0, 0, 0};
 	float[] initial_velocity = {0, 0, 0};
+	float new_y_velocity = 0;
 	float ball_locationX = 0.0f;
 	float ball_alpha = 0;
 	float ball_size = 0.3f;
 	float time_passed = 0;
+	float time_bounced_y = 0;
+	float time_bounced_z = 0;
 	float time_increment = 0;
 	float replay_increment = 0;
 	float time_passed2 = 0;
-	float newposition = 0;
-	
+	float[] new_ball_position = {0, 0, 0};
+	 
 	
 	Texture mytex = null; 
 	Texture myHUD = null;
@@ -93,18 +97,18 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        	
 	        	// "/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"
 	        	// "/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"
-	        	mytex = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/skybox2.jpg"), false);
-	        	myHUD = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/HUD2.png"), false);
-	        	myGround = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/grass.png"), false);
-	        	myCourt = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/court2.png"), false);
-	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building1.png"), false);
-	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building2.png"), false);
-	        	myBuildings = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/buildings_small.png"), false);
-	        	myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/goal.jpg"), false);
-	        	myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/udlr.png"), false);
-	        	myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/lr.png"), false);
-	        	myMeter = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/meter.png"), false);
-	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/speedSelection.png"), false);
+	        	mytex = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"), false);
+	        	myHUD = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/HUD2.png"), false);
+	        	myGround = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/grass.png"), false);
+	        	myCourt = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/court2.png"), false);
+	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building1.png"), false);
+	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building2.png"), false);
+	        	myBuildings = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/buildings_small.png"), false);
+	        	myGoal = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/goal.jpg"), false);
+	        	myUDLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/udlr.png"), false);
+	        	myLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/lr.png"), false);
+	        	myMeter = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/meter.png"), false);
+	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/speedSelection.png"), false);
 	        	
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
@@ -734,11 +738,15 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	velocity = 0;
 	    	ball_alpha = 0;
 	    	time_passed = 0;
-	    	time_increment=0;
+	    	time_increment = 0;
 	    	ball_size = 0.3f;
 	    	backboardHit=false;
+	    	ground_bounces = 0;
 	    	gameover=false;
 	    	exploding=false;
+	    	
+	    	time_bounced_y = 0;
+	    	time_bounced_z = 0;
 	    	
 	    	System.out.println("reset");
 	    }
@@ -756,18 +764,13 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	time_increment = 0.01f;
 	    
 	    	//calculate initial velocities
-	    	float ud_angle = (float)Math.atan(y_lookat/10);
-//	    	System.out.println("ud_angle (degrees) = " + ud_angle/Math.PI * 180);
+	    	float ud_angle = (float)Math.atan(y_lookat/10) + 0.2f; // adding 0.2 so the angle is a little higher
 	    	initial_velocity[1] = (float) (velocity * Math.sin(ud_angle));
-//	    	System.out.println("velocity = " + velocity);
-//	    	System.out.println("initial_velocity[1] = " + initial_velocity[1]);
+	    	new_y_velocity = initial_velocity[1];
 	    	float v_xz = (float) (velocity * Math.cos(ud_angle));
 	    	float lr_angle = (float)(rot*Math.PI/180);
-//	    	System.out.println("rot = " + rot);
 	    	initial_velocity[0] = (float) (v_xz * Math.sin(lr_angle));
-//	    	System.out.println("initial_velocity[0] = " + initial_velocity[0]);
 	    	initial_velocity[2] = (float) (-v_xz * Math.cos(lr_angle));
-//	    	System.out.println("initial_velocity[2] = " + initial_velocity[2]);
 	    }
 	    
 	    public void drawBall(final GL2 gl) {
@@ -791,33 +794,52 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    }
 	    public void updateBallLocation() {
 	    	//if ground is hit
-	    	if(ball_translation[1] <= (-1.6 + ball_size) && gameover==false){
-	    		System.out.println("You Lose");
-	    		playSound("lose.wav");
-	    		exploding=true;
-	    		gameover=true;
+	    	if(ball_translation[1] < (-1.6 + ball_size) && gameover==false){
+	    		new_y_velocity = 0.75f * -(new_y_velocity - 9.8f * (time_passed - time_bounced_y) );
+	    		new_ball_position[1] = ball_translation[1] + 0.2f;
+	    		time_bounced_y = time_passed;
+	    		playSound("backboard.wav");
+	    		
+	    		ground_bounces++;
+	    		if (ground_bounces > 3) {
+	    			//explode
+	    			System.out.println("You Lose");
+	    			playSound("lose.wav");
+	    			exploding = true;
+	    			gameover = true;
+	    		}
 	    	}
+	    	
 	    	//if board is hit
-	    	else if(((ball_locationX >= (-1 - ball_size*2) && ball_locationX <= (1 + ball_size*2)) && (ball_translation[1] >= (3.8f - 1.6f - ball_size*2) && ball_translation[1] < (5 - 1.6f + ball_size*2)) && ball_translation[2] <= -9.6f + ball_size*2)
+	    	if(((ball_locationX >= (-1 - ball_size*2) && ball_locationX <= (1 + ball_size*2)) && (ball_translation[1] >= (3.8f - 1.6f - ball_size*2) && ball_translation[1] < (5 - 1.6f + ball_size*2)) && ball_translation[2] <= -9.6f + ball_size*2)
 	    			&& backboardHit == false){
 	    		System.out.println("Backboard Hit");
 	    		playSound("backboard.wav");
 	    		time_passed2=0;
-	    		newposition = ball_translation[2];
+
+	    		new_ball_position[2] = ball_translation[2];
+	    		time_bounced_z = time_passed;
+	    		System.out.println("new_ball_position[2] = " + new_ball_position[2]);
 	    		backboardHit=true;
 	    	}
 	    	//if game isn't over
-	    	else if(gameover == false){
+	    	
+	    	if (gameover == false){
 	    		
 	    		ball_translation[0] = initial_velocity[0] * time_passed;
+	    		
+	    		if (ground_bounces > 0)
+	    			ball_translation[1] = new_ball_position[1] + (new_y_velocity * (time_passed - time_bounced_y)) - (9.8f/2 * (time_passed - time_bounced_y) * (time_passed - time_bounced_y));
+	    		else
+	    			ball_translation[1] = (initial_velocity[1] * time_passed) - (9.8f/2 * time_passed * time_passed);
+	    		
 	    		if(backboardHit){
-	    			//These 2 lines will have to be adjusted for actual physics. 
-	    			ball_translation[2] = newposition - (initial_velocity[2]/2 * time_passed2);
-	    			ball_translation[1] = (initial_velocity[1] * 2*time_passed) - (9.8f/2 * 2*time_passed * 2*time_passed);
+	    			// These 2 lines will have to be adjusted for actual physics.
+	    			// I gotchu
+	    			ball_translation[2] = new_ball_position[2] - initial_velocity[2]*0.9f * (time_passed - time_bounced_z); // multiply by 0.9 to reduce speed a little bit
 	    		}
 	    		else {
 	    			ball_translation[2] = initial_velocity[2] * time_passed;
-	    			ball_translation[1] = (initial_velocity[1] * time_passed) - (9.8f/2 * time_passed * time_passed);
 	    		}
 	    		
 	    		ball_locationX = ball_initial[0] + ball_translation[0];
@@ -837,12 +859,15 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ball_translation[0] = 0;
 	    	ball_translation[1] = 0;
 	    	ball_translation[2] = 0;
+	    	new_y_velocity = initial_velocity[1];
 	    	time_passed = 0;
 	    	ball_alpha=1;
 	    	ball_size = 0.3f;
 	    	exploding=false;
 	    	backboardHit=false;
 	    	gameover=false;
+	    	ground_bounces = 0;
+	    	time_bounced_y = 0;
 	    }
 	    
 	    public void drawSpeedSelection(final GL2 gl){
@@ -1098,7 +1123,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				public void run() {
 					try {
 						Clip clip = AudioSystem.getClip();
-						File soundFile = new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_sounds/" + url);
+						File soundFile = new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_sounds/" + url);
 						AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
 						clip.open(inputStream);
 						clip.start(); 
