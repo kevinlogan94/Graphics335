@@ -97,18 +97,18 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        	
 	        	// "/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"
 	        	// "/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"
-	        	mytex = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"), false);
-	        	myHUD = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/HUD2.png"), false);
-	        	myGround = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/grass.png"), false);
-	        	myCourt = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/court2.png"), false);
-	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building1.png"), false);
-	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building2.png"), false);
-	        	myBuildings = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/buildings_small.png"), false);
-	        	myGoal = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/goal.jpg"), false);
-	        	myUDLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/udlr.png"), false);
-	        	myLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/lr.png"), false);
-	        	myMeter = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/meter.png"), false);
-	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/speedSelection.png"), false);
+	        	mytex = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/skybox2.jpg"), false);
+	        	myHUD = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/HUD2.png"), false);
+	        	myGround = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/grass.png"), false);
+	        	myCourt = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/court2.png"), false);
+	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building1.png"), false);
+	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building2.png"), false);
+	        	myBuildings = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/buildings_small.png"), false);
+	        	myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/goal.jpg"), false);
+	        	myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/udlr.png"), false);
+	        	myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/lr.png"), false);
+	        	myMeter = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/meter.png"), false);
+	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/speedSelection.png"), false);
 	        	
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
@@ -577,19 +577,23 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glPopMatrix();
 		}
 		public void drawGoal(final GL2 gl){
+			//Rim
+			gl.glPushMatrix();
+			gl.glTranslated(0, 4, -9);//-9.6+.6
+			gl.glRotated(90, 1, 0, 0);
+			gl.glColor3d(255, 0, 0); 
+			glut.glutSolidTorus(0.02, 0.6, 5, 25);//rim radius is 0.6
+			gl.glPopMatrix();
+
+			//Stand
 			gl.glPushMatrix();
 			gl.glTranslated(0,4,-10);
-			gl.glPushMatrix();
-				gl.glRotated(90, 1, 0, 0);
-				gl.glColor3d(0, 0, 0);
-				glut.glutSolidCylinder(0.1f, 4, 20, 20);
-				gl.glPushMatrix();
-				gl.glTranslated(0, 0.8, 0.04);
-				gl.glColor3d(255, 0, 0); 
-				glut.glutSolidTorus(0.02, 0.4, 5, 25);
-				gl.glPopMatrix();
-		   	gl.glPopMatrix();	   
+			gl.glRotated(90, 1, 0, 0);
+			gl.glColor3d(0, 0, 0);
+			glut.glutSolidCylinder(0.1f, 4, 20, 20);   
 		   	gl.glPopMatrix();
+		   	
+		   	//Backboard
 		   	drawBackBoard(gl);
 	   }
 		public void drawBackBoard(final GL2 gl){
@@ -811,7 +815,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	}
 	    	
 	    	//if board is hit
-	    	if(((ball_locationX >= (-1 - ball_size*2) && ball_locationX <= (1 + ball_size*2)) && (ball_translation[1] >= (3.8f - 1.6f - ball_size*2) && ball_translation[1] < (5 - 1.6f + ball_size*2)) && ball_translation[2] <= -9.6f + ball_size*2)
+	    	if(((ball_locationX >= (-1 - ball_size) && ball_locationX <= (1 + ball_size)) 
+	    			&& (ball_translation[1] >= (3.8f - 1.6f - ball_size) && ball_translation[1] < (5 - 1.6f + ball_size)) 
+	    			&& (ball_translation[2] >= -10f + ball_size &&  ball_translation[2] <= -9.6f + ball_size))
 	    			&& backboardHit == false){
 	    		System.out.println("Backboard Hit");
 	    		playSound("backboard.wav");
@@ -822,8 +828,30 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    		System.out.println("new_ball_position[2] = " + new_ball_position[2]);
 	    		backboardHit=true;
 	    	}
-	    	//if game isn't over
 	    	
+//	    	(ball_locationX >= (-0.4 - ball_size) && ball_locationX <= (0.6 + ball_size)) 
+//			&& (ball_translation[1] >= 3.8f - 1.6f - ball_size && ball_translation[1] <= 4.1f - 1.6f + ball_size)
+	    	//radius is .6, y is 4, z is -9, x is 0
+	    	//If rim is hit
+	    	if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.4f*0.4f) 
+	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
+	    			&& gameover == false){
+	    		gameover = true;
+	    		playSound("win.wav");
+	    		System.out.println("You Win");
+	    	}
+	    	
+	    	else if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.8f*0.8f) 
+	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
+	    			&& gameover == false){
+	    		gameover = true;
+	    		exploding = true;
+	    		playSound("lose.wav");
+	    		System.out.println("Rim hit");
+	    		System.out.println("You Lose");
+	    	}
+	    	
+	    	//if game isn't over
 	    	if (gameover == false){
 	    		
 	    		ball_translation[0] = initial_velocity[0] * time_passed;
@@ -1123,8 +1151,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				public void run() {
 					try {
 						Clip clip = AudioSystem.getClip();
-						File soundFile = new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_sounds/" + url);
-						AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+						File soundFile = new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_sounds/" + url);						AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
 						clip.open(inputStream);
 						clip.start(); 
 					} catch (Exception e) {
