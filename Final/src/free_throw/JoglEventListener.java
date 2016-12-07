@@ -55,7 +55,6 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	float replay_increment = 0;
 	float time_passed2 = 0;
 	float[] new_ball_position = {0, 0, 0};
-	 
 	
 	Texture mytex = null; 
 	Texture myHUD = null;
@@ -69,7 +68,15 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	Texture myLR = null;
 	Texture myMeter = null;
 	Texture mySpeedSelection = null;
-
+	
+	float whiteSpecularLight [] = { 1.0f, 1.0f, 1.0f }; //set the light specular to white
+	float ambientLight [] = { 1.0f, 0.45f, 0.0f };
+	float diffuseLight [] = { 1.0f, 0.45f, 0.0f, 0.0f};
+	
+	float orangeDiffuseMaterial [] = { 1.0f, 0.45f, 0.0f }; //set the material to orange
+	float mShininess[] = { 20 }; //set the shininess of the material
+	float whiteSpecularMaterial [] = { 1.0f, 1.0f, 1.0f }; //set the material to white
+	
     private GLU glu = new GLU();
     private GLUT glut = new GLUT();
 
@@ -90,7 +97,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        gl.glClearDepth(1.0f);                      // Depth Buffer Setup
 	        gl.glEnable(GL.GL_DEPTH_TEST);              // Enables Depth Testing
 	        gl.glDepthFunc(GL.GL_LEQUAL);               // The Type Of Depth Testing To Do
-	        
+	        gl.glEnable(GL2.GL_LIGHTING); // enable lighting    
+	        gl.glEnable(GL2.GL_LIGHT0); // enable light0
+
 	        // load the texture;
 	        
 	        try {
@@ -570,13 +579,16 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glTexCoord2f(1, 0);
 			gl.glVertex3f(6, 0, -10.5f);
 
-
-
 			gl.glEnd();
 			gl.glDisable(GL.GL_TEXTURE_2D);
 			gl.glPopMatrix();
 		}
 		public void drawGoal(final GL2 gl){
+//	    	// set the material property
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 0);
+			
 			//Rim
 			gl.glPushMatrix();
 			gl.glTranslated(0, 4, -9);//-9.6+.6
@@ -724,6 +736,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	   }
 
 	    public void resetGame() {
+	    	
 	    	movement[0] = 0;
 	    	movement[1] = 0;
 	    	initial_velocity[0] = 0;
@@ -781,6 +794,11 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glEnable(gl.GL_BLEND);
 	    	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	    	
+//	    	// set the material property
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 0);
+	    	
 	    	gl.glPushMatrix();
 	    	
 	    	updateBallLocation();
@@ -829,9 +847,6 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    		backboardHit=true;
 	    	}
 	    	
-//	    	(ball_locationX >= (-0.4 - ball_size) && ball_locationX <= (0.6 + ball_size)) 
-//			&& (ball_translation[1] >= 3.8f - 1.6f - ball_size && ball_translation[1] <= 4.1f - 1.6f + ball_size)
-	    	//radius is .6, y is 4, z is -9, x is 0
 	    	//If rim is hit
 	    	if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.4f*0.4f) 
 	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
@@ -897,32 +912,61 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
 	    }
-	    
-	    public void drawSpeedSelection(final GL2 gl){
-	    	   gl.glPushMatrix();
-			   
-			   gl.glEnable(GL.GL_TEXTURE_2D);
-			   mySpeedSelection.bind(gl);
-			   gl.glBegin(GL2.GL_QUADS);
 
-			   gl.glTexCoord2f(0, 0);
-			   gl.glVertex3f(-0.2f, -0.35f, -1);
-			   gl.glTexCoord2f(0, 1);
-			   gl.glVertex3f(-0.2f, -0.2f, -1);
-			   gl.glTexCoord2f(1, 1);
-			   gl.glVertex3f(0.2f, -0.2f, -1);
-			   gl.glTexCoord2f(1, 0);
-			   gl.glVertex3f(0.2f, -0.35f, -1);
-			   gl.glEnd();
-			   gl.glDisable(GL.GL_TEXTURE_2D);
-			   
-			   gl.glPopMatrix();
+	    public void drawSpeedSelection(final GL2 gl){
+	    	gl.glPushMatrix();
+
+	    	gl.glEnable(GL.GL_TEXTURE_2D);
+	    	mySpeedSelection.bind(gl);
+	    	gl.glBegin(GL2.GL_QUADS);
+
+	    	gl.glTexCoord2f(0, 0);
+	    	gl.glVertex3f(-0.2f, -0.35f, -1);
+	    	gl.glTexCoord2f(0, 1);
+	    	gl.glVertex3f(-0.2f, -0.2f, -1);
+	    	gl.glTexCoord2f(1, 1);
+	    	gl.glVertex3f(0.2f, -0.2f, -1);
+	    	gl.glTexCoord2f(1, 0);
+	    	gl.glVertex3f(0.2f, -0.35f, -1);
+	    	gl.glEnd();
+	    	gl.glDisable(GL.GL_TEXTURE_2D);
+
+	    	gl.glPopMatrix();
+	    }
+
+	    public void cheat(){
+	    	movement[0] = 0;
+	    	movement[1] = 0;
+	    	rot = 0;
+	    	y_lookat = 8.59997f;
+	    	power = 0.210002f;
+	    	ball_translation[0] = 0;
+	    	ball_translation[1] = 0;
+	    	ball_translation[2] = 0;
+	    	new_y_velocity = initial_velocity[1];
+	    	time_passed = 0;
+	    	ball_alpha=1;
+	    	ball_size = 0.3f;
+	    	exploding=false;
+	    	backboardHit=false;
+	    	gameover=false;
+	    	gameTrigger=true;
+	    	ground_bounces = 0;
+	    	time_bounced_y = 0;
+	    	
+	    	shootBall();
 	    }
 	    
 	    @Override
 		public void display(GLAutoDrawable gLDrawable) {
 			// TODO Auto-generated method stub
 			final GL2 gl = gLDrawable.getGL().getGL2();
+			
+			float lightPosition_0[] = {0.0f, 10.0f, 0.0f, 1.0f}; // light position
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); // set light0 as diffuse light with related property
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, whiteSpecularLight, 0); // set light0 specular light
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); // set light0 ambient light
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition_0, 0); // set light0 position
 			
 			//movement[0] += (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
 			//movement[1] += (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
@@ -1077,6 +1121,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		    } else if (key == 'f') {
 		    	updateBallLocation();
 		    }
+			
+			if(key == 'c')
+				cheat();
 		}
 
 		@Override
