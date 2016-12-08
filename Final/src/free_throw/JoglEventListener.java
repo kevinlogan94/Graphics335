@@ -736,7 +736,6 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	   }
 
 	    public void resetGame() {
-	    	
 	    	movement[0] = 0;
 	    	movement[1] = 0;
 	    	initial_velocity[0] = 0;
@@ -795,9 +794,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	    	
 //	    	// set the material property
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 0);
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 1);
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 1);	
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 1);
 	    	
 	    	gl.glPushMatrix();
 	    	
@@ -806,7 +805,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glTranslatef(ball_initial[0] + ball_translation[0], ball_initial[1] + ball_translation[1], ball_initial[2] + ball_translation[2]);
 	    	gl.glColor4f(1, 0.45f, 0, ball_alpha);
 	    	
-	    	if(exploding && ball_size < 10 && ball_alpha > 0){
+	    	if(exploding && ball_size < 1 && ball_alpha > 0){
 	    	  ball_size+=.15f;
 	    	  ball_alpha-=.04f;
 	    	}
@@ -847,7 +846,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    		backboardHit=true;
 	    	}
 	    	
-	    	//If rim is hit
+	    	//If rim isn't hit
 	    	if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.4f*0.4f) 
 	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
 	    			&& gameover == false){
@@ -953,7 +952,27 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gameTrigger=true;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
-	    	
+	    	shootBall();
+	    }
+	    public void lose(){
+	    	movement[0] = 0;
+	    	movement[1] = 0;
+	    	rot = 0;
+	    	y_lookat = 3.29999f;
+	    	power = 0.27f;
+	    	ball_translation[0] = 0;
+	    	ball_translation[1] = 0;
+	    	ball_translation[2] = 0;
+	    	new_y_velocity = initial_velocity[1];
+	    	time_passed = 0;
+	    	ball_alpha=1;
+	    	ball_size = 0.3f;
+	    	exploding=false;
+	    	backboardHit=false;
+	    	gameover=false;
+	    	gameTrigger=true;
+	    	ground_bounces = 0;
+	    	time_bounced_y = 0;
 	    	shootBall();
 	    }
 	    
@@ -1124,6 +1143,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			
 			if(key == 'c')
 				cheat();
+			if(key == 'l')
+				lose();
 		}
 
 		@Override
