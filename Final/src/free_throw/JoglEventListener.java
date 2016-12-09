@@ -106,18 +106,18 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	        	
 	        	// "/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"
 	        	// "/Users/kevinlogan/Desktop/Workspace/basketball_textures/textures/skybox2.jpg"
-	        	mytex = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/skybox2.jpg"), false);
-	        	myHUD = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/HUD2.png"), false);
-	        	myGround = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/grass.png"), false);
-	        	myCourt = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_textures/textures/court2.png"), false);
-	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building1.png"), false);
-	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/building2.png"), false);
-	        	myBuildings = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/buildings_small.png"), false);
-	        	myGoal = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/goal.jpg"), false);
-	        	myUDLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/udlr.png"), false);
-	        	myLR = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/lr.png"), false);
-	        	myMeter = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/meter.png"), false);
-	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/kevinlogan/Desktop/workspace/Final/basketball_textures/textures/speedSelection.png"), false);
+	        	mytex = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/skybox2.jpg"), false);
+	        	myHUD = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/HUD2.png"), false);
+	        	myGround = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/grass.png"), false);
+	        	myCourt = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/court2.png"), false);
+	        	myBuildingFace1 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building1.png"), false);
+	        	myBuildingFace2 = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/building2.png"), false);
+	        	myBuildings = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/buildings_small.png"), false);
+	        	myGoal = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/goal.jpg"), false);
+	        	myUDLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/udlr.png"), false);
+	        	myLR = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/lr.png"), false);
+	        	myMeter = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/meter.png"), false);
+	        	mySpeedSelection = TextureIO.newTexture(new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_textures/textures/speedSelection.png"), false);
 	        	
 //	        	 int texID = mytex.getTextureObject();
 	        	 gl.glHint(GL2.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);  
@@ -987,8 +987,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); // set light0 ambient light
 			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition_0, 0); // set light0 position
 			
-			//movement[0] += (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
-			//movement[1] += (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
+//			movement[0] -= (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
+//			movement[1] -= (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
 			if(movement_state[1] == 1)
 				movement[1] += 0.1;
 			if(movement_state[1] == -1)
@@ -1173,6 +1173,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		            movement_state[1] = -1;
 			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
 		            movement_state[1] = 1;
+			 
+//			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 1;
+//			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = -1;
 			
 		}
 
@@ -1200,6 +1203,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		            movement_state[1] = 0;
 			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
 		            movement_state[1] = 0;
+//			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 0;
+//			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = 0;
 		}
 
 	  /*  
@@ -1219,7 +1224,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				public void run() {
 					try {
 						Clip clip = AudioSystem.getClip();
-						File soundFile = new File("/Users/kevinlogan/Desktop/Workspace/Final/basketball_sounds/" + url);						AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
+						File soundFile = new File("/Users/epheat07/Documents/git_repositories_fa2016/Graphics335/Final/basketball_sounds/" + url);						AudioInputStream inputStream = AudioSystem.getAudioInputStream(soundFile);
 						clip.open(inputStream);
 						clip.start(); 
 					} catch (Exception e) {
