@@ -70,8 +70,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	Texture mySpeedSelection = null;
 	
 	float whiteSpecularLight [] = { 1.0f, 1.0f, 1.0f }; //set the light specular to white
-	float ambientLight [] = { 1.0f, 0.45f, 0.0f };
-	float diffuseLight [] = { 1.0f, 0.45f, 0.0f, 0.0f};
+	float ambientLight [] = { 0.3f, 0.3f, 0.35f }; //set ambient light for light bounce off court
+	float diffuseLight [] = { 1.0f, 1.0f, 1.0f, 1.0f}; //set diffuse light intensity
 	
 	float orangeDiffuseMaterial [] = { 1.0f, 0.45f, 0.0f }; //set the material to orange
 	float mShininess[] = { 20 }; //set the shininess of the material
@@ -91,7 +91,15 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	     * @param gLDrawable The GLAutoDrawable object.
 	     */
 	    public void init(GLAutoDrawable gLDrawable) {
+	    	
 	        GL2 gl = gLDrawable.getGL().getGL2();
+	        
+	        float lightPosition_0[] = {0.0f, 10.0f, 0.0f, 1.0f}; // light position
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); // set light0 as diffuse light with related property
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, whiteSpecularLight, 0); // set light0 specular light
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); // set light0 ambient light
+			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition_0, 0); // set light0 position
+			
 	        //gl.glShadeModel(GL.GL_LINE_SMOOTH);              // Enable Smooth Shading
 	        gl.glClearColor(0.0f, 0.0f, 0.0f, 0.5f);    // Black Background
 	        gl.glClearDepth(1.0f);                      // Depth Buffer Setup
@@ -585,19 +593,30 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		}
 		public void drawGoal(final GL2 gl){
 //	    	// set the material property
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 0);
+			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
+			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
 			
 			//Rim
+			https://www.opengl.org/sdk/docs/man2/xhtml/glColorMaterial.xml
+//			this seems to imply that this glColorMaterial call is necessary
+	    	gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
+	    	gl.glEnable(GL2.GL_COLOR_MATERIAL);
+	    	gl.glColor3f(1.0f, 0.0f, 0.1f);	
+	    	
 			gl.glPushMatrix();
 			gl.glTranslated(0, 4, -9);//-9.6+.6
 			gl.glRotated(90, 1, 0, 0);
 			gl.glColor3d(255, 0, 0); 
-			glut.glutSolidTorus(0.02, 0.6, 5, 25);//rim radius is 0.6
+			glut.glutSolidTorus(0.028, 0.6, 5, 25);//rim radius is 0.6
 			gl.glPopMatrix();
 
 			//Stand
+			https://www.opengl.org/sdk/docs/man2/xhtml/glColorMaterial.xml
+//		   	this seems to imply that this glColorMaterial call is necessary
+	    	gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
+	    	gl.glEnable(GL2.GL_COLOR_MATERIAL);
+	    	gl.glColor3f(0.8f, 0.8f, 0.8f);	
+	    	
 			gl.glPushMatrix();
 			gl.glTranslated(0,4,-10);
 			gl.glRotated(90, 1, 0, 0);
@@ -794,21 +813,30 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	    	
 //	    	// set the material property
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 1);
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 1);	
-//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 1);
+			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SPECULAR, whiteSpecularMaterial, 0);
+			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_SHININESS, mShininess, 0);	
+			
+			// found a better way for the diffuse light than this. glColorMaterial
+//			gl.glMaterialfv(GL2.GL_FRONT_AND_BACK, GL2.GL_DIFFUSE, orangeDiffuseMaterial, 0);
 	    	
 	    	gl.glPushMatrix();
 	    	
 	    	updateBallLocation();
 	    	
 	    	gl.glTranslatef(ball_initial[0] + ball_translation[0], ball_initial[1] + ball_translation[1], ball_initial[2] + ball_translation[2]);
-	    	gl.glColor4f(1, 0.45f, 0, ball_alpha);
 	    	
-	    	if(exploding && ball_size < 1 && ball_alpha > 0){
+	    	//ball exploding
+	    	if(exploding && ball_size < 10 && ball_alpha > 0){
 	    	  ball_size+=.15f;
 	    	  ball_alpha-=.04f;
 	    	}
+	    	
+//	    	https://www.opengl.org/sdk/docs/man2/xhtml/glColorMaterial.xml
+//	    	this seems to imply that this glColorMaterial call is necessary
+	    	gl.glColorMaterial(GL2.GL_FRONT_AND_BACK, GL2.GL_AMBIENT_AND_DIFFUSE);
+	    	gl.glEnable(GL2.GL_COLOR_MATERIAL);
+	    	gl.glColor4f(1, 0.45f, 0, ball_alpha);	
+	    	
 	    	glut.glutSolidSphere(ball_size, 20, 20);
 	    	
 	    	gl.glPopMatrix();
@@ -981,11 +1009,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			// TODO Auto-generated method stub
 			final GL2 gl = gLDrawable.getGL().getGL2();
 			
-			float lightPosition_0[] = {0.0f, 10.0f, 0.0f, 1.0f}; // light position
-			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_DIFFUSE, diffuseLight, 0); // set light0 as diffuse light with related property
-			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_SPECULAR, whiteSpecularLight, 0); // set light0 specular light
-			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_AMBIENT, ambientLight, 0); // set light0 ambient light
-			gl.glLightfv(GL2.GL_LIGHT0, GL2.GL_POSITION, lightPosition_0, 0); // set light0 position
+			
 			
 //			movement[0] -= (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
 //			movement[1] -= (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
