@@ -37,13 +37,16 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	boolean powerGrowth = false;
 	boolean gameTrigger = false;
 	boolean gameover = false;
+	boolean gamewon = false;
 	boolean backboardHit = false;
 	boolean exploding = false;
+	boolean fading = false;
 	int ground_bounces = 0;
 	
 	float[] ball_initial = {0, 0, 0};
 	float[] ball_translation = {0, 0, 0};
 	float[] initial_velocity = {0, 0, 0};
+	float[] current_velocity = {0, 0, 0};
 	float new_y_velocity = 0;
 	float ball_locationX = 0.0f;
 	float ball_alpha = 0;
@@ -760,6 +763,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	initial_velocity[0] = 0;
 	    	initial_velocity[1] = 0;
 	    	initial_velocity[2] = 0;
+	    	current_velocity[0] = 0;
+	    	current_velocity[1] = 0;
+	    	current_velocity[2] = 0;
 	    	ball_translation[0] = 0;
 	    	ball_translation[1] = 0;
 	    	ball_translation[2] = 0;
@@ -778,7 +784,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	backboardHit=false;
 	    	ground_bounces = 0;
 	    	gameover=false;
+	    	gamewon = false;
 	    	exploding=false;
+	    	fading = false;
 	    	
 	    	time_bounced_y = 0;
 	    	time_bounced_z = 0;
@@ -796,7 +804,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	
 	    	//make ball visible
 	    	ball_alpha = 1;
-	    	time_increment = 0.01f;
+	    	time_increment = 0.013f;
 	    
 	    	//calculate initial velocities
 	    	float ud_angle = (float)Math.atan(y_lookat/10) + 0.2f; // adding 0.2 so the angle is a little higher
@@ -806,9 +814,13 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	float lr_angle = (float)(rot*Math.PI/180);
 	    	initial_velocity[0] = (float) (v_xz * Math.sin(lr_angle));
 	    	initial_velocity[2] = (float) (-v_xz * Math.cos(lr_angle));
+	    	
+	    	for (int i=0; i<3; i++)
+	    		current_velocity[i] = initial_velocity[i];
 	    }
 	    
 	    public void drawBall(final GL2 gl) {
+	    		    	
 	    	gl.glEnable(gl.GL_BLEND);
 	    	gl.glBlendFunc(gl.GL_SRC_ALPHA, gl.GL_ONE_MINUS_SRC_ALPHA);
 	    	
@@ -826,10 +838,19 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	gl.glTranslatef(ball_initial[0] + ball_translation[0], ball_initial[1] + ball_translation[1], ball_initial[2] + ball_translation[2]);
 	    	
 	    	//ball exploding
-	    	if(exploding && ball_size < 10 && ball_alpha > 0){
+	    	if(!fading && exploding && ball_size < 10 && ball_alpha > 0){
 	    	  ball_size+=.15f;
 	    	  ball_alpha-=.04f;
 	    	}
+	    	
+//	    	ball simply fading
+	    	if(fading){
+	    		if (ball_alpha > 0)
+	    			ball_alpha-=.03f;
+	    		else
+	    			gameover = true;
+		    }
+	    	
 	    	
 //	    	https://www.opengl.org/sdk/docs/man2/xhtml/glColorMaterial.xml
 //	    	this seems to imply that this glColorMaterial call is necessary
@@ -851,11 +872,17 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    		
 	    		ground_bounces++;
 	    		if (ground_bounces > 3) {
-	    			//explode
-	    			System.out.println("You Lose");
-	    			playSound("lose.wav");
-	    			exploding = true;
-	    			gameover = true;
+	    			if (gamewon) {
+	    				//explode but don't make the player "lose"
+	    				exploding = true;
+		    			gameover = true;
+	    			} else {
+		    			//explode
+		    			System.out.println("You Lose");
+		    			playSound("lose.wav");
+		    			exploding = true;
+		    			gameover = true;
+	    			}
 	    		}
 	    	}
 	    	
@@ -874,18 +901,24 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    		backboardHit=true;
 	    	}
 	    	
-	    	//If rim isn't hit
+	    	//Rim collision detection
 	    	if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.4f*0.4f) 
 	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
-	    			&& gameover == false){
-	    		gameover = true;
+	    			&& gameover == false && gamewon == false){
+	    		
+//	    		ball must drop straight down.
+	    		gamewon = true;
+//	    		current_velocity[0] = 0;
+//	    		current_velocity[2] = 0;
+	    		fading = true;
+	    		
 	    		playSound("win.wav");
 	    		System.out.println("You Win");
 	    	}
 	    	
 	    	else if(((ball_locationX * ball_locationX) + (ball_translation[2] + 9) * (ball_translation[2] + 9)) <= (0.8f*0.8f) 
 	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
-	    			&& gameover == false){
+	    			&& gameover == false && gamewon == false){
 	    		gameover = true;
 	    		exploding = true;
 	    		playSound("lose.wav");
@@ -896,20 +929,20 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	//if game isn't over
 	    	if (gameover == false){
 	    		
-	    		ball_translation[0] = initial_velocity[0] * time_passed;
+	    		ball_translation[0] = current_velocity[0] * time_passed;
 	    		
 	    		if (ground_bounces > 0)
 	    			ball_translation[1] = new_ball_position[1] + (new_y_velocity * (time_passed - time_bounced_y)) - (9.8f/2 * (time_passed - time_bounced_y) * (time_passed - time_bounced_y));
 	    		else
-	    			ball_translation[1] = (initial_velocity[1] * time_passed) - (9.8f/2 * time_passed * time_passed);
+	    			ball_translation[1] = (current_velocity[1] * time_passed) - (9.8f/2 * time_passed * time_passed);
 	    		
 	    		if(backboardHit){
 	    			// These 2 lines will have to be adjusted for actual physics.
 	    			// I gotchu
-	    			ball_translation[2] = new_ball_position[2] - initial_velocity[2]*0.9f * (time_passed - time_bounced_z); // multiply by 0.9 to reduce speed a little bit
+	    			ball_translation[2] = new_ball_position[2] - current_velocity[2]*0.9f * (time_passed - time_bounced_z); // multiply by 0.9 to reduce speed a little bit
 	    		}
 	    		else {
-	    			ball_translation[2] = initial_velocity[2] * time_passed;
+	    			ball_translation[2] = current_velocity[2] * time_passed;
 	    		}
 	    		
 	    		ball_locationX = ball_initial[0] + ball_translation[0];
@@ -934,8 +967,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ball_alpha=1;
 	    	ball_size = 0.3f;
 	    	exploding=false;
+	    	fading = false;
 	    	backboardHit=false;
 	    	gameover=false;
+	    	gamewon=false;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
 	    }
@@ -975,8 +1010,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ball_alpha=1;
 	    	ball_size = 0.3f;
 	    	exploding=false;
+	    	fading = false;
 	    	backboardHit=false;
 	    	gameover=false;
+	    	gamewon=false;
 	    	gameTrigger=true;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
@@ -996,8 +1033,10 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ball_alpha=1;
 	    	ball_size = 0.3f;
 	    	exploding=false;
+	    	fading = false;
 	    	backboardHit=false;
 	    	gameover=false;
+	    	gamewon=false;
 	    	gameTrigger=true;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
@@ -1111,16 +1150,16 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 				movement_state[1] = -1;
 			
 			if(XX > -5.2 && XX < -2.5 && YY < -7 && YY > -9){
-				time_increment=0.01f;
+				time_increment=0.013f;
 				replay();
 			}
 			if(XX > -2.5 && XX < 1.8 && YY < -7 && YY > -9){
-				time_increment=(float)1/4*(0.01f);
+				time_increment=(float)1/4*(0.013f);
 				System.out.println(time_increment);
 				replay();
 			}
 			if(XX > 1.8 && XX < 5.1 && YY < -7 && YY > -9){
-				time_increment=(float)1/10*(0.01f);
+				time_increment=(float)1/10*(0.013f);
 				replay();
 			}
 		}
