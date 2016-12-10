@@ -742,9 +742,9 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 					   }
 				   }
 				   else if((hitRightMeter == 0 && hitLeftMeter == 0) || (hitRightMeter == 1 && hitLeftMeter == 1))  
-					   power += 0.01f;
+					   power += 0.008f;
 				   else
-					   power -= 0.01f;
+					   power -= 0.008f;
 
 				   //Increment if right or left side of bar is hit
 				   if(power >= 2*(0.195f))
