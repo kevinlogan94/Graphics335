@@ -38,6 +38,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	boolean gameTrigger = false;
 	boolean gameover = false;
 	boolean gamewon = false;
+	boolean freecam = false;
 	boolean backboardHit = false;
 	boolean exploding = false;
 	boolean fading = false;
@@ -785,6 +786,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	ground_bounces = 0;
 	    	gameover=false;
 	    	gamewon = false;
+	    	freecam = false;
 	    	exploding=false;
 	    	fading = false;
 	    	
@@ -847,8 +849,11 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	if(fading){
 	    		if (ball_alpha > 0)
 	    			ball_alpha-=.03f;
-	    		else
+	    		else {
 	    			gameover = true;
+	    			freecam = true;
+	    		}
+	    			
 		    }
 	    	
 	    	
@@ -876,12 +881,14 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    				//explode but don't make the player "lose"
 	    				exploding = true;
 		    			gameover = true;
+		    			freecam = true;
 	    			} else {
 		    			//explode
 		    			System.out.println("You Lose");
 		    			playSound("lose.wav");
 		    			exploding = true;
 		    			gameover = true;
+		    			freecam = true;
 	    			}
 	    		}
 	    	}
@@ -920,6 +927,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    			&& (ball_translation[1] >= 3.8f - 1.6f && ball_translation[1] <= 4.1f - 1.6f)
 	    			&& gameover == false && gamewon == false){
 	    		gameover = true;
+	    		freecam = true;
 	    		exploding = true;
 	    		playSound("lose.wav");
 	    		System.out.println("Rim hit");
@@ -1014,6 +1022,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	backboardHit=false;
 	    	gameover=false;
 	    	gamewon=false;
+	    	freecam = false;
 	    	gameTrigger=true;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
@@ -1037,6 +1046,7 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 	    	backboardHit=false;
 	    	gameover=false;
 	    	gamewon=false;
+	    	freecam = false;
 	    	gameTrigger=true;
 	    	ground_bounces = 0;
 	    	time_bounced_y = 0;
@@ -1048,14 +1058,21 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			// TODO Auto-generated method stub
 			final GL2 gl = gLDrawable.getGL().getGL2();
 			
+			if (freecam) {
+				// free movement
+				movement[0] += (movement_state[0]*0.08)*Math.cos(-rot/180*Math.PI) + (movement_state[1]*0.08)*Math.sin(rot/180*Math.PI);
+				movement[1] += (movement_state[1]*0.08)*Math.cos(-rot/180*Math.PI) + (movement_state[0]*0.08)*Math.sin(-rot/180*Math.PI);
+				
+				
+			} else {
+				// limited movement
+				if(movement_state[1] == 1)
+					movement[1] += 0.1;
+				if(movement_state[1] == -1)
+					movement[1] -= 0.1;
+			}
 			
 			
-//			movement[0] -= (movement_state[0]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[1]*0.04)*Math.sin(-rot/180*Math.PI);
-//			movement[1] -= (movement_state[1]*0.04)*Math.cos(rot/180*Math.PI) + (movement_state[0]*0.04)*Math.sin(rot/180*Math.PI);
-			if(movement_state[1] == 1)
-				movement[1] += 0.1;
-			if(movement_state[1] == -1)
-				movement[1] -= 0.1;
 			rot -= drag_amount[0];
 			y_lookat -= drag_amount[1]/10;
 			
@@ -1237,8 +1254,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
 		            movement_state[1] = 1;
 			 
-//			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 1;
-//			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = -1;
+			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 1;
+			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = -1;
 			
 		}
 
@@ -1266,8 +1283,8 @@ public class JoglEventListener implements GLEventListener, KeyListener, MouseLis
 		            movement_state[1] = 0;
 			 if (e.getKeyCode()  == KeyEvent.VK_LEFT )
 		            movement_state[1] = 0;
-//			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 0;
-//			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = 0;
+			 if (e.getKeyCode()  == KeyEvent.VK_UP ) movement_state[0] = 0;
+			 if (e.getKeyCode()  == KeyEvent.VK_DOWN ) movement_state[0] = 0;
 		}
 
 	  /*  
